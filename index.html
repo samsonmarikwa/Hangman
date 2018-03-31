@@ -1,4 +1,4 @@
-<!doctype <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -6,157 +6,100 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Hangman</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap 4 used -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
         crossorigin="anonymous">
+
     <link rel="stylesheet" type="text/css" media="screen" href="assets/css/style.css" />
     <script src="assets/javascript/game.js"></script>
-
-    <!-- if a correct guess, put a star on the flag. The blue background of the flag will not have the circle of stars.
-        when a game starts, print the flag without the stars.
-    -->
-
-    <style>
-        .container1,
-        .container2 {
-            float: left;
-        }
-
-        .emoji {
-            height: 50px;
-            width: 50px;
-        }
-
-        table {
-            width: 100%;
-        }
-
-        table,
-        th,
-        td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 15px;
-            text-align: left;
-        }
-
-        table#t01 tr:nth-child(even) {
-            background-color: #eee;
-        }
-
-        table#t01 tr:nth-child(odd) {
-            background-color: #fff;
-        }
-
-        table#t01 th {
-            background-color: black;
-            color: white;
-        }
-    </style>
 
 </head>
 
 <body>
-    <div class="container1">
-        <div>
-            <h2>Original United States of America flag</h2>
-            <p>Guess the State game</p>
-            <img src="https://www.worldatlas.com/webimage/flags/1777flg.gif" alt="USA Flag 13 states" width="800" height="550">
+
+    <div class="container-fluid">
+        <h1>Guess The State Game</h1>
+        <div class="row" id="row1">
+            <div class="col-sm-6">
+                <h2>Original United States of America Flag</h2>
+                <img src="https://www.worldatlas.com/webimage/flags/1777flg.gif" alt="USA Flag 13 states" height="45%" width="80%">
+                <p class="flag-text">Thirteen American colonies that declared themselves independent from England and the British Crown</p>
+            </div>
+
+            <div class="col-sm-3">
+
+                <h2 id="states-hdr">States Played List</h2>
+
+                <table id="t01">
+                    <tr>
+                        <th>State Name</th>
+                    </tr>
+
+                </table>
+
+            </div>
+
+
+            <div class="col-sm-3" id="scoreboard-col">
+                <h2 id="scoreboard-hdr">Game Scoreboard</h2>
+                <div class="scoreboard">
+                    <div id="remain-block">Remaining States:
+                        <span id="guess-remaining">0</span>
+                    </div>
+                    <div id="winning-block">
+                        <img class="emoji" src="https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/118/smiling-face-with-open-mouth-and-smiling-eyes_1f604.png"
+                            alt="wins">
+                        <span id="wins">0</span>
+                    </div>
+                    <div id="loss-block">
+                        <img class="emoji" src="https://emojipedia-us.s3.amazonaws.com/thumbs/60/samsung/75/pensive-face_1f614.png" alt="Losses:">
+                        <span id="losses">0</span>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
-        <p>Thirteen American colonies that declared themselves independent from England and the British Crown</p>
-        <p>Let's test your history knowledge</p>
-        <p>Press any key to start, Esc to abandon the game, Page Down to get the next state the computer has picked</p>
-        <p id="state-name">---</p>
+
+        <div class="row" id="input-row">
+            <div class="col-sm-12">
+                <p id="input"></p>
+            </div>
+
+        </div>
+
+
+        <div class="row" id="letters-row">
+            <div class="col-sm-5">
+
+                <div id="available-letters-col">
+                    <h4 class="available-hdr">Available Letters</h4>
+                    <ul id="available-letters-pool"></ul>
+                </div>
+            </div>
+            <div class="col-sm-2">
+            </div>
+
+            <div class="col-sm-5">
+
+                <div id="quarantine-col">
+                    <h4 class="quarantine-hdr">Quarantined Letters</h4>
+                    <p id="quarantined-letters-pool"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" class="instructions-row">
+            <div class="col-sm-12">
+                <div id="instruction-col">
+                    <h5 class="instructions-hdr">Lets test your history</h5>
+                    <p class="instructions">Type letters that are in the Available Letters pool for your guess to match what the computer has picked
+                    </p>
+                </div>
+            </div>
+
+        </div>
     </div>
-
-    <div class="container2">
-        <p>
-            <span id="remain-block">Remaining:
-                <span id="guess-remaining">0</span>
-            </span>
-            <span id="winning-block">
-                <img class="emoji" src="https://emojipedia-us.s3.amazonaws.com/thumbs/120/apple/118/smiling-face-with-open-mouth-and-smiling-eyes_1f604.png"
-                    alt="wins">
-                <span id="wins">0</span>
-            </span>
-            <span>
-                <img class="emoji" src="https://emojipedia-us.s3.amazonaws.com/thumbs/60/samsung/75/pensive-face_1f614.png" alt="Losses:">
-                <span id="losses">0</span>
-            </span>
-        </p>
-
-        <h2>States Played List</h2>
-
-        <table id="t01">
-            <tr>
-                <th>State Name</th>
-
-            </tr>
-            <tr>
-                <td>Jill</td>
-
-            </tr>
-            <tr>
-                <td>Eve</td>
-
-            </tr>
-            <tr>
-                <td>John</td>
-
-            </tr>
-        </table>
-    </div>
-
-    <div>
-        <p id="place-holder">-----</p>
-    </div>
-
-    <!-- button to add more rows to the table -->
-    <button onclick="addTableRow()">Add Row</button>
-    <button onclick="pickState()">Pick State</button>
-
-    <script>
-        /* function to add rows to the table */
-
-        var statesPlayed = []; /* create empty global array of statesPlayed */
-
-        function addTableRow() {
-            var table = document.getElementById("t01");
-            var row = table.insertRow(1);
-            var cell1 = row.insertCell(0);
-            cell1.innerHTML = "NEW CELL1";
-        }
-
-        function pickState() {
-            var usStates = ['Delaware',
-                'Pennsylvania',
-                'New Jersey',
-                'Georgia',
-                'Connecticut',
-                'Massachusetts Bay',
-                'Maryland',
-                'South Carolina',
-                'New Hampshire',
-                'Virginia',
-                'New York',
-                'North Carolina',
-                'Rhode Island and Providence Plantations'
-            ];
-
-            var statePicked = usStates[Math.floor(Math.random() * usStates.length)];
-            statesPlayed[statesPlayed.length] = statePicked;
-            
-            console.log("State picked: " + statePicked);
-            console.log("Length of statesPlayed: " + statesPlayed.length);
-            for (i = 0; i < statesPlayed.length; i++) {
-                console.log(statesPlayed[i]);
-            }
-        }
-    </script>
 
 </body>
 

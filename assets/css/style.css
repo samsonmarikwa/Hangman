@@ -1,8 +1,25 @@
+body {
+    background-color: lightgray;
+}
+
+.game-hdr-ltr {
+    font-size: 40px;
+    font-weight: 500;
+    color: white;
+    line-height: 25px;
+    text-align: center;
+    background-color: palevioletred;
+    height: 60px;
+    padding-top: 15px;
+    padding-bottom: 2px;
+    margin-top: 0px;
+    margin-bottom: 2px;
+}
 .scoreboard {
     border: 1px solid;
     height: 180px;
+    position: relative;
 }
-
 
 #remain-block,
 #winning-block,
@@ -17,26 +34,65 @@
 }
 
 #remain-block {
+    position: relative;
     background-color: aquamarine;
 }
 
 #winning-block {
+    position: relative;
     background-color: burlywood;
 }
 
 #loss-block {
+    position: relative;
     background-color: cornflowerblue;
+}
+
+
+#remain-block,
+#winning-block,
+#loss-block {
+    padding-left: 10px;
+}
+
+#guess-remaining {
+    top: 5px;
+}
+
+#guess-remaining,
+#wins,
+#losses {
+    position: absolute;
+    right: 10px;
+    float: right;
+    text-align: right;
+    height: 50px;
+    line-height: 30px;
+    font-size: 35px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 5px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    margin-right: 15px;
+    margin-left: 15px;
+    margin: auto;
+    border-style: inset;
+    width: 70px;
+    font-weight: bold;
 }
 
 #available-letters-col,
 #quarantine-col {
-    height: 150px;
+    display: flex;
+    flex-direction: column;
+    min-height: 10.5em;
 }
 
 #input {
     text-align: center;
-    height: 40px;
-    font-size: 35px;
+    height: 60px;
+    font-size: 25px;
     padding-top: 5px;
     padding-bottom: 5px;
     margin-top: 15px;
@@ -45,14 +101,18 @@
     margin-left: 15px;
     margin: auto;
     border-style: inset;
-    width: 500px;
+    width: 900px;
     font-weight: bold;
 }
 
+#game-result-txt {
+    font-size: xx-large;
+    font-weight: 900;
+}
 
 #input-row {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     
 }
 
@@ -93,11 +153,18 @@
 }
 
 #letters-row {
-    height: 150px;
+    height: 135px;
+}
+
+#message {
+    height: 20px;
+    text-align: center;
+    color: green;
+    font-weight: bold;
 }
 
 #instruction-col {
-    height: 80px;
+    height: 130px;
     border: 1px solid palevioletred;
     margin-top: 10px;
     text-align: center;
@@ -150,21 +217,6 @@ table#t01 th {
     background-color: black;
     color: white;
 }
-
-/* alphabetic list */
-
-ul {
-    list-style: none;
-    background-color: #f1f1f1;
-    list-style-type: none;
-    padding: 10px;
-    font-size: 40px;
-}
-
-li {
-    float: left;
-}
-
 
 #row1 {
     padding-top: 0px;

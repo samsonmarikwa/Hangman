@@ -4,6 +4,11 @@ var statesWon = 0; // number of states the user got right
 var statesLost = 0; // number of states the user got wrong
 var trialsAllowed = 0;
 var correctLettersPicked = 0;
+var correctLetters = [];
+
+var statePicked = "";
+var stateNameVar = "";
+var letters = "";
 
 var guessControl = 0;
 var quarantine = [];
@@ -14,14 +19,11 @@ var statesRemaining = 0; // number of games remaining before the game ends.
 var statesArray = []; // create global array of states
 var alphabets = [];
 
-init();
-var statePicked = pickRandomState();
-var stateNameVar = statePicked;
-
 /*
 This function initializes all variables
 */
 function init() {
+
     statePicked = ""; // initialize global variable of state picked name
     statesWon = 0; // number of states the user got right
     statesLost = 0; // number of states the user got wrong    
@@ -31,7 +33,8 @@ function init() {
     trialsAllowed = 0;
     guessControl = 0;
     quarantine = [];
-    initAlphabets(quarantine, "quarantined");
+    letters = "";
+    initAlphabets("quarantined");
 
     statesArray = []; // create global array of states
     initStates(['DELAWARE', 'PENNSYLVANIA', 'NEW JERSEY', 'GEORGIA', 'CONNECTICUT',
@@ -39,27 +42,29 @@ function init() {
         'NEW YORK', 'NORTH CAROLINA', 'RHODE ISLAND AND PROVIDENCE PLANTATIONS'
     ]); // create global array of states)
     alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-];
+        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+    ];
 
-    initAlphabets(alphabets, "available");
+    letters = alphabets.join("");
+
+    initAlphabets("available");
+
+    
 }
 
 /*
 This function creates the alphabetic array and calls the function to update the user interface
 */
-function initAlphabets(array, lettersPool) {
-    
+function initAlphabets(pool) {
+
     // populate the letters list on the UI
-    var letters = array.join("");
-    console.log(letters);
-    window.onload = function() {
-        if (lettersPool == "available") {
-            document.getElementById("letters-availed").innerHTML = letters;
-        }
-        else if (lettersPool == "quarantined") {
-            document.getElementById("quarantined-letters").innerHTML = letters;
-        }
+    
+    if (pool == "available") {
+        document.getElementById("letters-availed").innerHTML = "";
+        document.getElementById("letters-availed").innerHTML = letters;
+    } else if (pool == "quarantined") {
+        document.getElementById("quarantined-letters").innerHTML = "";
+        document.getElementById("quarantined-letters").innerHTML = letters;
     }
 }
 
@@ -88,16 +93,24 @@ with dashes equivalent to the length of the state picked. The picked state is re
 from the array so that it is not picked again.
 */
 function pickRandomState() {
-
     // pick up a random state
-    console.log(statesArray);
-    console.log("Length of statesArray: " + statesArray.length);
-    /*********** may need to trap errors. What happens when there is no state name returned ***** */
+    /*********** need to trap errors. ***** */
 
     var stateName = "";
+    var placeHolder = "";
     try {
         stateName = statesArray[Math.floor(Math.random() * statesArray.length)];
-        console.log("State Picked: " + stateName);
+        
+        correctLetters.splice(0, correctLetters.length); // remove elements
+
+        for (var count = 0; count < stateName.length; count++) {
+            correctLetters[count] = "-  ";
+        }
+
+        placeHolder = correctLetters.join("");
+
+        document.getElementById("input").innerHTML = "";
+        document.getElementById("input").innerHTML = placeHolder;
 
         /* set the number of errors the user is allowed before the computer displays the random picked state
         and picks the next state. The user will be allowed 2 times the length of the state picked.
@@ -114,21 +127,19 @@ function pickRandomState() {
         trialsAllowed = newVar.length * 2; // to determine correct count
         guessControl = newVar.length;
         correctLettersPicked = 0;
-
-        console.log("Unique: " + newVar + " Sorted :" + sortState + "    " + "Original: " + stateName);
-        console.log(trialsAllowed);
-
+        
         statesRemaining = statesArray.length; // reset the statesRemaining
+        document.getElementById("guess-remaining").innerHTML = statesRemaining.toString();
+        document.getElementById("message").innerHTML = trialsAllowed.toString() + " Errors Allowed For This State Picked By The Computer";
+
 
         statesArray.splice(statesArray.indexOf(stateName), 1); // find position of the stateName in the statesArray and remove it
 
-        /* display input area based on length of statePicked **** 
-        check code to create html to display on the user interface ***********  */
-        /* display trialsAllowed to notify user how many chances allowed to get the state right */
     } catch (err) {
-        console.log("Expect the test on line 449 to handle situation when statesremaining is 0");
         statesRemaining = 0;
+
     } finally {
+
         return stateName;
     }
 }
@@ -143,12 +154,39 @@ function userGuess(typedLetter, stateName) {
 
     try { // trap errors
         // capture the key the user has typed
+
+        // check if key is in quarantine
+        if (alphabets.indexOf(typedLetter) <= -1) {
+            throw "Letter is not in the Available letters pool";
+        }
+
+        if (quarantine.indexOf(typedLetter) > -1) {
+            throw "You cannot type a quarantined letter as it is not in the state name picked";
+        }
+
+        // check if key is in correct letters
+        if (correctLetters.indexOf(typedLetter) > -1) {
+            throw "You cannot type a letter that is in the input already";
+        }
+
         if (stateName.indexOf(typedLetter) > -1) {
             /*
             Typed letter exist in the statePicked string variable
             */
-            // split the statePicked into an array separated by the typed letter
 
+            for (var count = 0; count < statePicked.length; count++) {
+                if (typedLetter == statePicked.substr(count, 1)) {
+                    if (correctLetters[count] == "-  ") {
+                        correctLetters[count] = typedLetter + "  ";
+                    }
+                }
+            }
+            
+            placeHolder = correctLetters.join("");
+            
+            document.getElementById("input").innerHTML = "";
+            document.getElementById("input").innerHTML = placeHolder;
+            // split the statePicked into an array separated by the typed letter
 
             for (var y = 0; y <= stateName.length; y++) {
                 if (stateName.substr(y, 1) != typedLetter) {
@@ -160,18 +198,20 @@ function userGuess(typedLetter, stateName) {
             ++correctLettersPicked;
 
             // put letter in the correct position of the input prompt area to match
-            // where the letter occurs in the state
+            // where the letter occurs in the state        
 
         } else {
             /*
             Typed letter does not exist in the statePicked string variable
             */
+
             quarantine.push(typedLetter); // add the typed letter to the quarantine
-            initAlphabets(quarantine, "quarantined"); // display letters in quarantine
+            letters = quarantine.join("");
+            initAlphabets("quarantined"); // display letters in quarantine
 
             --trialsAllowed;
             //display trialsAllowed
-            
+            document.getElementById("message").innerHTML = "You now have " + trialsAllowed + " guesses left";
         }
 
         if ((correctLettersPicked >= guessControl) || (trialsAllowed <= 0)) {
@@ -182,40 +222,38 @@ function userGuess(typedLetter, stateName) {
                 addTableRow(statePicked); // list the state the user got right on the UI
 
                 // put a star on the bluebackground of the flag
-                // display the stateWon counter
+
+                document.getElementById("wins").innerHTML = statesWon;
             }
             if (trialsAllowed <= 0) {
                 new Audio("assets/soundclip/DisappointedCrowd.mp3"); // play crowd disappointment soundclip
                 ++statesLost;
-
-                // display the statesLost counter
-                // display the stateCorrectName in the user input area
-
+                document.getElementById("losses").innerHTML = statesLost;
+                document.getElementById("message").innerHTML = "The computer picked: " + statePicked;
             }
-            console.log("correct letters picked: " + correctLettersPicked);
-            console.log("guess control: " + guessControl);
             statePicked = pickRandomState();
             stateNameVar = statePicked;
             stateName = statePicked;
-            console.log("I have picked state: " + stateNameVar);
             quarantine = [];
             alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-        ];
-            initAlphabets(alphabets, "available");
-            initAlphabets(quarantine, "quarantined");
+                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+            ];
+            letters = alphabets.join("");
+            initAlphabets("available");
+            letters = "";
+            initAlphabets("quarantined");
         } else {
             // remove typed letter from the pool of alphabets so it is not available
             alphabets.splice(alphabets.indexOf(typedLetter), 1);
-            initAlphabets(alphabets, "available");
+            letters = alphabets.join("");
+            initAlphabets("available");
+
         }
     } catch (err) {
-        console.log("Press Alt key to restart the game");
+        document.getElementById("message").innerHTML = err;
     } finally {
 
         new Audio("assets/soundclip/UpliftingBackgroundMusic.mp3"); //resume motivational background music
-        console.log("stateName value returned: " + stateName);
-
         return stateName;
     }
 }
@@ -226,51 +264,52 @@ Main process
 
 document.onkeyup = function (event) {
 
+    document.getElementById("message").innerHTML = "";
+
     var keyTyped = event.keyCode || event.which;
 
-    if (keyTyped != 27) {
+    document.getElementById("guess-remaining").innerHTML = statesRemaining;
+    new Audio("assets/soundclip/UpliftingBackgroundMusic.mp3"); // background music
 
-        console.log("What is the states remaining now: " + statesRemaining);
-
-        if (statesRemaining == 0) {
-            if (statesWon >= 13) {
-                console.log("WIN !!!! All states have been played. You the champion");
-                new Audio("assets/soundclip/TheStarSpangledBanner.mp3");
-            } else {
-                console.log(
-                    "Game Lost... Prankster Whackhead Simpson 94.7 Highveld Stereo South Africa to cheer you up"
-                );
-                new Audio("assets/soundclip/prius.mp4");
-            }
-            init();
-            new Audio("assets/soundclip/UpliftingBackgroundMusic.mp3"); // background music
-        } else {
-            if (keyTyped >= 65 && keyTyped <= 90) {
-                stateNameVar = userGuess(String.fromCharCode(keyTyped).toUpperCase(), stateNameVar);
-                console.log(stateNameVar);
-                // fire a keyup event
-                if (typeof stateNameVar == "undefined") {
-
-                    var e = new Event("keyup");
-                    e.key = "a"; // just enter the char you want to send 
-                    e.keyCode = e.key.charCodeAt(0);
-                    e.which = e.keyCode;
-                    e.altKey = false;
-                    e.ctrlKey = true;
-                    e.shiftKey = false;
-                    e.metaKey = false;
-                    e.bubbles = true;
-                    document.dispatchEvent(e);
-                    init();
-                    statePicked = pickRandomState();
-                    stateNameVar = statePicked;
-                }
-            } else {
-                console.log("Press letter keys or ESC to abandon game");
+    if (keyTyped == 16) {
+        var numberOfRows = document.getElementById("t01").getElementsByTagName("tr").length;
+        for (var x = 1; x < numberOfRows; x++) {
+            if (numberOfRows > 0) {
+                document.getElementById("t01").deleteRow(x);
             }
         }
-    } else {
         init();
-        new Audio("assets/soundclip/UpliftingBackgroundMusic.mp3"); // background music
+        statePicked = pickRandomState();
+        stateNameVar = statePicked;
+    }
+
+    if (keyTyped >= 65 && keyTyped <= 90) {
+        stateNameVar = userGuess(String.fromCharCode(keyTyped).toUpperCase(), stateNameVar);
+        // fire a keyup event
+        if (typeof stateNameVar == "undefined") {
+
+            var e = new Event("keyup");
+            e.key = "a"; // just enter the char you want to send 
+            e.keyCode = e.key.charCodeAt(0);
+            e.which = e.keyCode;
+            e.altKey = false;
+            e.ctrlKey = true;
+            e.shiftKey = false;
+            e.metaKey = false;
+            e.bubbles = true;
+            document.dispatchEvent(e);
+            init();
+            statePicked = pickRandomState();
+            stateNameVar = statePicked;
+        }
+    }
+
+    if (statesRemaining == 0) {
+        if (statesWon >= 13) {
+            document.getElementById("game-result-txt").innerHTML = "WINNER - All states played. You the champion!!!";
+            new Audio("assets/soundclip/TheStarSpangledBanner.mp3");
+        } else {
+            document.getElementById("game-result-txt").innerHTML = "LOST GAME - Some states were not correct";
+        }
     }
 }

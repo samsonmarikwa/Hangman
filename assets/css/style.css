@@ -64,8 +64,8 @@
     border: 2px solid green;
 }
 
-#available-letters-pool,
-#quarantined-letters-pool {
+#letters-availed,
+#quarantined-letters {
     font-size: 40px;
     font-weight: bold;
     letter-spacing: 8px;

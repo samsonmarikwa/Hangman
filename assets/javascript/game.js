@@ -31,48 +31,36 @@ function init() {
     trialsAllowed = 0;
     guessControl = 0;
     quarantine = [];
+    initAlphabets(quarantine, "quarantined");
 
     statesArray = []; // create global array of states
     initStates(['DELAWARE', 'PENNSYLVANIA', 'NEW JERSEY', 'GEORGIA', 'CONNECTICUT',
         'MASSACHUSETTS BAY', 'MARYLAND', 'SOUTH CAROLINA', 'NEW HAMPSHIRE', 'VIRGINIA',
         'NEW YORK', 'NORTH CAROLINA', 'RHODE ISLAND AND PROVIDENCE PLANTATIONS'
     ]); // create global array of states)
-    alphabets = [];
-    initAlphabets(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-    ]);
+    alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+];
+
+    initAlphabets(alphabets, "available");
 }
 
 /*
 This function creates the alphabetic array and calls the function to update the user interface
 */
-function initAlphabets(array) {
-    alphabets = array;
-
-    // populate the alphabetic list on the UI with the initial alphabets
-    document.getElementById('available-letters-pool').appendChild(makeAlphabeticList(alphabets));
-}
-
-/*
-This function populates the alphabetic pool on the user interface
-*/
-function makeAlphabeticList(array) {
-    // Create the list element:
-    var list = document.createElement('ul');
-
-    for (var i = 0; i < array.length; i++) {
-        // Create the list item:
-        var item = document.createElement('li');
-
-        // Set its contents:
-        item.appendChild(document.createTextNode(array[i]));
-
-        // Add it to the list:
-        list.appendChild(item);
+function initAlphabets(array, lettersPool) {
+    
+    // populate the letters list on the UI
+    var letters = array.join("");
+    console.log(letters);
+    window.onload = function() {
+        if (lettersPool == "available") {
+            document.getElementById("letters-availed").innerHTML = letters;
+        }
+        else if (lettersPool == "quarantined") {
+            document.getElementById("quarantined-letters").innerHTML = letters;
+        }
     }
-
-    // Finally, return the constructed list:
-    return list;
 }
 
 /*
@@ -179,10 +167,11 @@ function userGuess(typedLetter, stateName) {
             Typed letter does not exist in the statePicked string variable
             */
             quarantine.push(typedLetter); // add the typed letter to the quarantine
+            initAlphabets(quarantine, "quarantined"); // display letters in quarantine
 
             --trialsAllowed;
             //display trialsAllowed
-            // display letters in quarantine
+            
         }
 
         if ((correctLettersPicked >= guessControl) || (trialsAllowed <= 0)) {
@@ -210,14 +199,15 @@ function userGuess(typedLetter, stateName) {
             stateName = statePicked;
             console.log("I have picked state: " + stateNameVar);
             quarantine = [];
-            alphabets = [];
-            initAlphabets(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-            ]);
+            alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        ];
+            initAlphabets(alphabets, "available");
+            initAlphabets(quarantine, "quarantined");
         } else {
             // remove typed letter from the pool of alphabets so it is not available
             alphabets.splice(alphabets.indexOf(typedLetter), 1);
-            initAlphabets(alphabets);
+            initAlphabets(alphabets, "available");
         }
     } catch (err) {
         console.log("Press Alt key to restart the game");

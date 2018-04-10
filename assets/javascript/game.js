@@ -1,4 +1,10 @@
-new Audio("assets/soundclip/UpliftingBackgroundMusic.mp3"); // background music
+// audio clips
+var clappingAudio = new Audio("assets/soundclip/AudienceClapping.mp3");
+var disappointedAudio = new Audio("assets/soundclip/DisappointedCrowd.mp3");
+var spangledBanner = new Audio("assets/soundclip/TheStarSpangledBanner.mp3");
+var upliftMusic = new Audio("assets/soundclip/UpliftingBackgroundMusic.mp3");
+
+spangledBanner.play();
 
 var statesWon = 0; // number of states the user got right
 var statesLost = 0; // number of states the user got wrong
@@ -32,6 +38,11 @@ function init() {
     correctLettersPicked = 0;
     trialsAllowed = 0;
     guessControl = 0;
+
+    document.getElementById("guess-remaining").innerHTML = statesRemaining.toString();
+    document.getElementById("wins").innerHTML = statesWon.toString();
+    document.getElementById("losses").innerHTML = statesLost.toString();
+
     quarantine = [];
     letters = "";
     initAlphabets("quarantined");
@@ -49,7 +60,6 @@ function init() {
 
     initAlphabets("available");
 
-    
 }
 
 /*
@@ -58,7 +68,7 @@ This function creates the alphabetic array and calls the function to update the 
 function initAlphabets(pool) {
 
     // populate the letters list on the UI
-    
+
     if (pool == "available") {
         document.getElementById("letters-availed").innerHTML = "";
         document.getElementById("letters-availed").innerHTML = letters;
@@ -100,7 +110,7 @@ function pickRandomState() {
     var placeHolder = "";
     try {
         stateName = statesArray[Math.floor(Math.random() * statesArray.length)];
-        
+
         correctLetters.splice(0, correctLetters.length); // remove elements
 
         for (var count = 0; count < stateName.length; count++) {
@@ -113,24 +123,24 @@ function pickRandomState() {
         document.getElementById("input").innerHTML = placeHolder;
 
         /* set the number of errors the user is allowed before the computer displays the random picked state
-        and picks the next state. The user will be allowed 2 times the length of the state picked.
+        and picks the next state. The user will be allowed the number of characters as the chance to enter the correct state picked.
         */
 
         // sort state name and retain unique characters to determine the correct count
 
         var sortState = stateName.split("").sort();
-        sortState = sortState.filter(function (item, index, self) {
+        sortState = sortState.filter(function(item, index, self) {
             return self.indexOf(item) == index;
         });
         var newVar = sortState.join("").trim();
 
-        trialsAllowed = newVar.length * 2; // to determine correct count
+        trialsAllowed = newVar.length; // to determine correct count
         guessControl = newVar.length;
         correctLettersPicked = 0;
-        
+
         statesRemaining = statesArray.length; // reset the statesRemaining
         document.getElementById("guess-remaining").innerHTML = statesRemaining.toString();
-        document.getElementById("message").innerHTML = trialsAllowed.toString() + " Errors Allowed For This State Picked By The Computer";
+        document.getElementById("message").innerHTML = trialsAllowed.toString() + " Typed Wrong Letters Allowed For The State Picked By The Computer";
 
 
         statesArray.splice(statesArray.indexOf(stateName), 1); // find position of the stateName in the statesArray and remove it
@@ -156,10 +166,6 @@ function userGuess(typedLetter, stateName) {
         // capture the key the user has typed
 
         // check if key is in quarantine
-        if (alphabets.indexOf(typedLetter) <= -1) {
-            throw "Letter is not in the Available letters pool";
-        }
-
         if (quarantine.indexOf(typedLetter) > -1) {
             throw "You cannot type a quarantined letter as it is not in the state name picked";
         }
@@ -167,6 +173,10 @@ function userGuess(typedLetter, stateName) {
         // check if key is in correct letters
         if (correctLetters.indexOf(typedLetter) > -1) {
             throw "You cannot type a letter that is in the input already";
+        }
+
+        if (alphabets.indexOf(typedLetter) <= -1) {
+            throw "Letter is not in the Available letters pool";
         }
 
         if (stateName.indexOf(typedLetter) > -1) {
@@ -181,9 +191,9 @@ function userGuess(typedLetter, stateName) {
                     }
                 }
             }
-            
+
             placeHolder = correctLetters.join("");
-            
+
             document.getElementById("input").innerHTML = "";
             document.getElementById("input").innerHTML = placeHolder;
             // split the statePicked into an array separated by the typed letter
@@ -216,17 +226,15 @@ function userGuess(typedLetter, stateName) {
 
         if ((correctLettersPicked >= guessControl) || (trialsAllowed <= 0)) {
             if (correctLettersPicked >= guessControl) {
-
-                new Audio("assets/soundclip/AudienceClapping.mp3"); // play audience clapping soundclip
+                clappingAudio.play();
                 ++statesWon;
                 addTableRow(statePicked); // list the state the user got right on the UI
-
-                // put a star on the bluebackground of the flag
 
                 document.getElementById("wins").innerHTML = statesWon;
             }
             if (trialsAllowed <= 0) {
-                new Audio("assets/soundclip/DisappointedCrowd.mp3"); // play crowd disappointment soundclip
+
+                disappointedAudio.play(); // play crowd disappointment soundclip
                 ++statesLost;
                 document.getElementById("losses").innerHTML = statesLost;
                 document.getElementById("message").innerHTML = "The computer picked: " + statePicked;
@@ -253,7 +261,6 @@ function userGuess(typedLetter, stateName) {
         document.getElementById("message").innerHTML = err;
     } finally {
 
-        new Audio("assets/soundclip/UpliftingBackgroundMusic.mp3"); //resume motivational background music
         return stateName;
     }
 }
@@ -262,22 +269,24 @@ function userGuess(typedLetter, stateName) {
 Main process
 */
 
-document.onkeyup = function (event) {
+document.onkeyup = function(event) {
 
     document.getElementById("message").innerHTML = "";
 
     var keyTyped = event.keyCode || event.which;
 
     document.getElementById("guess-remaining").innerHTML = statesRemaining;
-    new Audio("assets/soundclip/UpliftingBackgroundMusic.mp3"); // background music
 
     if (keyTyped == 16) {
         var numberOfRows = document.getElementById("t01").getElementsByTagName("tr").length;
-        for (var x = 1; x < numberOfRows; x++) {
+        console.log("Number of rows in table: " + numberOfRows);
+        for (var x = numberOfRows - 1; x > 0; x--) {
             if (numberOfRows > 0) {
+                console.log("row to be deleted: " + x);
                 document.getElementById("t01").deleteRow(x);
             }
         }
+        document.getElementById("game-result-txt").innerHTML = "";
         init();
         statePicked = pickRandomState();
         stateNameVar = statePicked;
@@ -286,30 +295,37 @@ document.onkeyup = function (event) {
     if (keyTyped >= 65 && keyTyped <= 90) {
         stateNameVar = userGuess(String.fromCharCode(keyTyped).toUpperCase(), stateNameVar);
         // fire a keyup event
-        if (typeof stateNameVar == "undefined") {
+        // if (typeof stateNameVar == "undefined") {
 
-            var e = new Event("keyup");
-            e.key = "a"; // just enter the char you want to send 
-            e.keyCode = e.key.charCodeAt(0);
-            e.which = e.keyCode;
-            e.altKey = false;
-            e.ctrlKey = true;
-            e.shiftKey = false;
-            e.metaKey = false;
-            e.bubbles = true;
-            document.dispatchEvent(e);
-            init();
-            statePicked = pickRandomState();
-            stateNameVar = statePicked;
-        }
+        //     var e = new Event("keyup");
+        //     e.key = "a"; // just enter the char you want to send 
+        //     e.keyCode = e.key.charCodeAt(0);
+        //     e.which = e.keyCode;
+        //     e.altKey = false;
+        //     e.ctrlKey = true;
+        //     e.shiftKey = false;
+        //     e.metaKey = false;
+        //     e.bubbles = true;
+        //     document.dispatchEvent(e);
+        //     init();
+        //     statePicked = pickRandomState();
+        //     stateNameVar = statePicked;
+        // }
     }
 
-    if (statesRemaining == 0) {
-        if (statesWon >= 13) {
-            document.getElementById("game-result-txt").innerHTML = "WINNER - All states played. You the champion!!!";
-            new Audio("assets/soundclip/TheStarSpangledBanner.mp3");
-        } else {
-            document.getElementById("game-result-txt").innerHTML = "LOST GAME - Some states were not correct";
-        }
+    if (statesWon >= 13 && statesRemaining <= 0) {
+        spangledBanner.play();
+        document.getElementById("game-result-txt").innerHTML = "WINNER - All states played. You the champion!!!";
+        document.getElementById("guess-remaining").innerHTML = statesRemaining.toString();
+        document.getElementById("wins").innerHTML = statesWon.toString();
+        document.getElementById("losses").innerHTML = statesLost.toString();
+    }
+
+    if (statesLost > 0 && statesRemaining <= 0) {
+        upliftMusic.play();
+        document.getElementById("game-result-txt").innerHTML = "LOST GAME - Some states were not correct";
+        document.getElementById("guess-remaining").innerHTML = statesRemaining.toString();
+        document.getElementById("wins").innerHTML = statesWon.toString();
+        document.getElementById("losses").innerHTML = statesLost.toString();
     }
 }
